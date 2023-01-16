@@ -1,27 +1,40 @@
 <script>
 	let claimType = "gratuity";
-	let gapInSvc = false;
 
-	
-	let dor = {y:2022,m:6,d:15}; let des = {y:1990,m:4,d:16};
 	//Calculate years in service
+		let gapInSvc = true; let gapD = {gap1:{y1:0,m1:0,d1:0,y2:0,m2:0,d2:0},gap2:{y1:0,m1:0,d1:0,y2:0,m2:0,d2:0},gap3:{y1:0,m1:0,d1:0,y2:0,m2:0,d2:0}};
+		let dor = {y:2022,m:6,d:15}; let des = {y:1990,m:4,d:16};
 		const yearsInSvc =(a,b)=>{
-		a = new Date(a); b = new Date(b);
-		let d1 = {yr:a.getFullYear(),mos:a.getMonth()+1,days:a.getDate()};
-		let d2 = {yr:b.getFullYear(),mos:b.getMonth()+1,days:b.getDate()};
-		let diff = {y:0,m:0,d:0};
-		let output = {y:0,m:0,d:0};
-		
-		diff.d = d2.days-d1.days; diff.m = d2.mos-d1.mos; diff.y = d2.yr-d1.yr;
-		output.y = (diff.m<0)? (diff.y-1):diff.y;
-		output.m = (diff.m<0)? diff.m+12:((diff.d<0)? diff.m-1:diff.m);
-		output.d = (diff.d<0)? (diff.d+30):diff.d;
-		
-		if(diff.y<0) return {year:`invalid`};
-		
-		return {years:output.y,months:output.m,days:output.d}
-	}
-	$:yrsinsvc = yearsInSvc(`${des.y}-${des.m}-${des.d}`,`${dor.y}-${dor.m}-${dor.d}`);
+			a = new Date(a); b = new Date(b);
+			let d1 = {yr:a.getFullYear(),mos:a.getMonth()+1,days:a.getDate()};
+			let d2 = {yr:b.getFullYear(),mos:b.getMonth()+1,days:b.getDate()};
+			let diff = {y:0,m:0,d:0};
+			let output = {y:0,m:0,d:0};
+			
+			diff.d = d2.days-d1.days; diff.m = d2.mos-d1.mos; diff.y = d2.yr-d1.yr;
+			output.y = (diff.m<0)? (diff.y-1):diff.y;
+			output.m = (diff.m<0)? diff.m+12:((diff.d<0)? diff.m-1:diff.m);
+			output.d = (diff.d<0)? (diff.d+30):diff.d;
+			
+			if(diff.y<0) return {year:`invalid`};
+			
+			return {years:output.y,months:output.m,days:output.d}
+		}
+		const gapInService = a =>{
+			let b,c,d; 
+			b = yearsInSvc(`${a.gap1.y1}-${a.gap1.m1}-${a.gap1.d1}`,`${a.gap1.y2}-${a.gap1.m2}-${a.gap1.d2}`);
+			c = yearsInSvc(`${a.gap2.y1}-${a.gap2.m1}-${a.gap2.d1}`,`${a.gap2.y2}-${a.gap2.m2}-${a.gap2.d2}`);
+			d = yearsInSvc(`${a.gap3.y1}-${a.gap3.m1}-${a.gap3.d1}`,`${a.gap3.y2}-${a.gap3.m2}-${a.gap3.d2}`);
+
+			let sum = {y:0,m:{t:0,r:0},d:{t:0,r:0}};
+			sum.d.t = b.days + c.days + d.days; sum.d.r = (sum.d.t>30)? (sum.d.t%30):sum.d.t; 
+			sum.m.t = b.months + c.months + d.months + (sum.d.t/30); sum.m.r = (sum.m.t>12)? (sum.m.t%12):sum.m.t;
+			sum.y = b.years + c.months + d.years + (sum.m.t/12);
+
+			return {years:sum.y,months:sum.m,days:sum.d};
+		}
+		$:gapinsvc = gapInService(gapD);
+		$:yrsinsvc = yearsInSvc(`${des.y}-${des.m}-${des.d}`,`${dor.y}-${dor.m}-${dor.d}`);
 	//end of function
 	
 	//calculate highest salary received
@@ -49,7 +62,7 @@
 				
 			  return {basepay:output.bp.toFixed(2),pagi:output.pagi,longpay:output.lp.toFixed(2),hsr:output.hsr.toFixed(2)}
 		}
-		$:hsr = highestSalaryRcvd(selectedrank,yrsinsvc.years,rankup);
+		$:hsr = highestSalaryRcvd(selectedrank,(gapInSvc)? gapinsvc.years:yrsinsvc.years,rankup);
 	//end of function
 	
 	//function for computation of total rate
@@ -88,22 +101,56 @@
 <input type="radio" value="gratuity" bind:group={claimType}> Gratuity 
 <input type="radio" value="terminal" bind:group={claimType}> Terminal
 <br/>
-<!--Gap in Service? <input type="checkbox" bind:checked={gapInSvc}> -->
+
 <hr/>
 <h4>I. CREDITABLE YEARS IN SERVICE</h4>
+Gap in Service? <input type="checkbox" bind:checked={gapInSvc}>
 <table>
 	<tr>
 		<th></th><th>Years</th><th>Months</th><th>Days</th>
 	</tr>
-	<tr>
-		<td>Date of Retirement</td><td><input class="dateInputs" type="number" bind:value={dor.y}></td><td><input class="dateInputs" type="number" bind:value={dor.m}></td><td><input class="dateInputs" type="number" bind:value={dor.d}></td>
-	</tr>
-	<tr>
-		<td>Date Entered Service</td><td><input class="dateInputs" type="number" bind:value={des.y}></td><td><input class="dateInputs" type="number" bind:value={des.m}></td><td><input class="dateInputs" type="number" bind:value={des.d}></td>
-	</tr>
-	<tr>
-		<td>Total Years in Service</td><td class="dateInputCell"><b>{yrsinsvc.years}</b></td><td class="dateInputCell"><b>{yrsinsvc.months}</b></td><td class="dateInputCell"><b>{yrsinsvc.days}</b></td>
-	</tr>
+	{#if gapInSvc}
+		<tr>
+			<td style="font-weight:bold;" colspan="4">1st Service</td>
+		</tr>
+		<tr>
+			<td>Date of Retirement</td><td><input class="dateInputs" type="number" bind:value={gapD.gap1.y2}></td><td><input class="dateInputs" type="number" bind:value={gapD.gap1.m2}></td><td><input class="dateInputs" type="number" bind:value={gapD.gap1.d2}></td>
+		</tr>
+		<tr>
+			<td>Date Entered Service</td><td><input class="dateInputs" type="number" bind:value={gapD.gap1.y1}></td><td><input class="dateInputs" type="number" bind:value={gapD.gap1.m1}></td><td><input class="dateInputs" type="number" bind:value={gapD.gap1.d1}></td>
+		</tr>
+		<tr>
+			<td style="font-weight:bold;" colspan="4">2nd Service</td>
+		</tr>
+		<tr>
+			<td>Date of Retirement</td><td><input class="dateInputs" type="number" bind:value={gapD.gap2.y1}></td><td><input class="dateInputs" type="number" bind:value={gapD.gap2.m2}></td><td><input class="dateInputs" type="number" bind:value={gapD.gap2.d2}></td>
+		</tr>
+		<tr>
+			<td>Date Entered Service</td><td><input class="dateInputs" type="number" bind:value={gapD.gap2.y2}></td><td><input class="dateInputs" type="number" bind:value={gapD.gap2.m1}></td><td><input class="dateInputs" type="number" bind:value={gapD.gap2.d1}></td>
+		</tr>
+		<tr>
+			<td style="font-weight:bold;" colspan="4">3rd Service</td>
+		</tr>
+		<tr>
+			<td>Date of Retirement</td><td><input class="dateInputs" type="number" bind:value={gapD.gap3.y1}></td><td><input class="dateInputs" type="number" bind:value={gapD.gap3.m2}></td><td><input class="dateInputs" type="number" bind:value={gapD.gap3.d2}></td>
+		</tr>
+		<tr>
+			<td>Date Entered Service</td><td><input class="dateInputs" type="number" bind:value={gapD.gap3.y2}></td><td><input class="dateInputs" type="number" bind:value={gapD.gap3.m1}></td><td><input class="dateInputs" type="number" bind:value={gapD.gap3.d1}></td>
+		</tr>
+		<tr>
+			<td>Total Years in Service</td><td class="dateInputCell"><b>{yrsinsvc.years}</b></td><td class="dateInputCell"><b>{yrsinsvc.months}</b></td><td class="dateInputCell"><b>{yrsinsvc.days}</b></td>
+		</tr>
+	{:else}
+		<tr>
+			<td>Date of Retirement</td><td><input class="dateInputs" type="number" bind:value={dor.y}></td><td><input class="dateInputs" type="number" bind:value={dor.m}></td><td><input class="dateInputs" type="number" bind:value={dor.d}></td>
+		</tr>
+		<tr>
+			<td>Date Entered Service</td><td><input class="dateInputs" type="number" bind:value={des.y}></td><td><input class="dateInputs" type="number" bind:value={des.m}></td><td><input class="dateInputs" type="number" bind:value={des.d}></td>
+		</tr>
+		<tr>
+			<td>Total Years in Service</td><td class="dateInputCell"><b>{yrsinsvc.years}</b></td><td class="dateInputCell"><b>{yrsinsvc.months}</b></td><td class="dateInputCell"><b>{yrsinsvc.days}</b></td>
+		</tr>
+	{/if}
 </table>
 <hr>
 
@@ -193,7 +240,7 @@ with one rank higher? <input type="checkbox" bind:checked={rankup}/> <br/>
 {/if}
 <style>
 	.dateInputs{
-		width:100px;
+		width:70px;
 		text-align:center;
 	}
 	.dateInputCell{
