@@ -13,7 +13,7 @@
 			
 			diff.d = d2.days-d1.days; diff.m = d2.mos-d1.mos; diff.y = d2.yr-d1.yr;
 			output.y = (diff.m<0)? (diff.y-1):diff.y;
-			output.m = (diff.m<0)? diff.m+12:((diff.d<0)? diff.m-1:diff.m);
+			output.m = (diff.m<0)? (((diff.d<0)? diff.m-1:diff.m)+12):((diff.d<0)? diff.m-1:diff.m);
 			output.d = (diff.d<0)? (diff.d+30):diff.d;
 			
 			if(diff.y<0) return {year:`invalid`};
