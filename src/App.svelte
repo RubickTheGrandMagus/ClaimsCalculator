@@ -2,7 +2,7 @@
 	let claimType = "gratuity";
 
 	//Calculate years in service
-		let gapInSvc = true; let gapD = {gap1:{y1:1998,m1:11,d1:16,y2:2008,m2:1,d2:1},gap2:{y1:2008,m1:2,d1:2,y2:2016,m2:12,d2:13},gap3:{y1:2018,m1:3,d1:26,y2:2020,m2:5,d2:26}};
+		let gapInSvc = false; let gapD = {gap1:{y1:1998,m1:11,d1:16,y2:2008,m2:1,d2:1},gap2:{y1:2008,m1:2,d1:2,y2:2016,m2:12,d2:13},gap3:{y1:2018,m1:3,d1:26,y2:2020,m2:5,d2:26}};
 		let dor = {y:0,m:0,d:0}; let des = {y:0,m:0,d:0}; let birth = '1990-05-27'; let retType = "";
 		const yearsInSvc =(a,b)=>{ //a is date entered; b is date retired
 			a = new Date(a); b = new Date(b);
@@ -92,7 +92,7 @@
 	
 	//function for computation of total rate
 		const computeTotalRate = a =>{
-			let total = (a.years*2.5) + ((a.months*2.5)/12) + ((a.days*2.5)/360);
+			let total = parseFloat((a.years*2.5).toFixed(5)) + parseFloat(((a.months*2.5)/12).toFixed(5)) + parseFloat(((a.days*2.5)/360).toFixed(5));
 			return {rateYr:(a.years*2.5),rateMos:((a.months*2.5)/12),rateDays:((a.days*2.5)/360),rateTotal:total}
 		}
 		$:computetotalrate = computeTotalRate((gapInSvc)? gapinsvc:yearsInSvc(`${des.y}-${des.m}-${des.d}`,`${dor.y}-${dor.m}-${dor.d}`));
@@ -287,7 +287,7 @@ Rank:
 	Total Leave Benefits = <b>₱ {money(hsr.hsr)}</b> x <b>{computeleave.total.toFixed(3)}</b> x <b>0.0481927</b> = <b>₱ {money((parseFloat(hsr.hsr)*computeleave.total*0.0481927).toFixed(2))}</b>
 </p>
 {/if}
-<span>Copyright CSUPT FRANCIS CHARLES T SAMSON - Retirements Claims Calculator v1.1</span> 
+<span>Copyright ITCU 7 - Retirements Claims Calculator v1.5</span> 
 <style>
 	.dateInputs{
 		width:70px;
