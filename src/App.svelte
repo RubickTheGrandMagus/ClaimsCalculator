@@ -85,7 +85,7 @@
 				output.lp = output.bp * multiplier;
 				output.hsr = output.bp + output.lp;
 				
-			  return {basepay:output.bp.toFixed(2),pagi:output.pagi,longpay:output.lp.toFixed(2),hsr:output.hsr.toFixed(2)}
+			  return {basepay:output.bp.toFixed(2),pagi:output.pagi,longpay:output.lp.toFixed(2),hsr:output.hsr.toFixed(2),rank:rank}
 		}
 		$:hsr = highestSalaryRcvd(selectedrank,(gapInSvc)? gapinsvc.years:yrsinsvc.years,rankup);
 	//end of function
@@ -129,20 +129,6 @@
 
 <hr/>	
 <h4>I. CREDITABLE YEARS IN SERVICE</h4>
-Date of Birth <input type="date" bind:value={birth}/> <br>
-{#if !gapInSvc}
-	Type of Retirement
-	<select bind:value={retType} on:change={()=>changeDate()}>
-		<option value="">Select</option>
-		<option value="opt">Optional</option>
-		<option value="com56">Compulsory 56</option>
-		<option value="com60">Compulsory 60</option>
-	</select> <br/>
-	{#if errorMsg.err}
-		<i style="font-size: small;color:red;">{errorMsg.msg}</i>
-	{/if}
-{/if}
-<br/>
 Gap in Service? <input type="checkbox" bind:checked={gapInSvc}>
 <table>
 	<tr>
@@ -196,10 +182,23 @@ Gap in Service? <input type="checkbox" bind:checked={gapInSvc}>
 			<td>Date Entered Service</td><td><input class="dateInputs" type="number" bind:value={des.y}></td><td><input class="dateInputs" type="number" bind:value={des.m}></td><td><input class="dateInputs" type="number" bind:value={des.d}></td>
 		</tr>
 		<tr>
-			<td>Total Years in Service</td><td class="dateInputCell"><b>{yrsinsvc.years}</b></td><td class="dateInputCell"><b>{yrsinsvc.months}</b></td><td class="dateInputCell"><b>{yrsinsvc.days}</b></td>
+			<td>Total Years in Service</td><td class="dateInputCell"><b>{yrsinsvc.years || '0'}</b></td><td class="dateInputCell"><b>{yrsinsvc.months || '0'}</b></td><td class="dateInputCell"><b>{yrsinsvc.days || '0'}</b></td>
 		</tr>
 	{/if}
 </table>
+Date of Birth <input type="date" bind:value={birth}/> <br>
+{#if !gapInSvc}
+	Type of Retirement
+	<select bind:value={retType} on:change={()=>changeDate()}>
+		<option value="">Select</option>
+		<option value="opt">Optional</option>
+		<option value="com56">Compulsory 56</option>
+		<option value="com60">Compulsory 60</option>
+	</select> <br/>
+	{#if errorMsg.err}
+		<i style="font-size: small;color:red;">{errorMsg.msg}</i>
+	{/if}
+{/if}
 <hr>
 
 <h4>
@@ -214,13 +213,13 @@ Rank:
 	{/each}
 </select>
 	with one rank higher? <input type="checkbox" bind:checked={rankup}/> <br/>
-
+	<b>Retired Rank <u>{hsr.rank}</u></b>
 	<table>
 		<tr>
 			<td>Base Pay: </td> <td>₱ {money(hsr.basepay)}</td>		
 		</tr>
 		<tr>
-			<td>[{hsr.pagi}]Long Pay: </td><td>₱ {money(hsr.longpay)}</td>
+			<td>[{hsr.pagi || 0}]Long Pay: </td><td>₱ {money(hsr.longpay)}</td>
 		</tr>
 		<tr style="">
 			<td>Highest Salary Received:</td><td>₱ {money(hsr.hsr)}</td>
@@ -234,13 +233,13 @@ Rank:
 </h4>
 <table>
 	<tr>
-		<td style="text-align:center;font-weight:bold;border-bottom:1px solid black;">{(gapInSvc)? gapinsvc.years:yrsinsvc.years}</td><td>yrs X 2.5%</td><td>=</td><td style="text-align:right;font-weight:bold;border-bottom:1px solid black;">{computetotalrate.rateYr.toFixed(5)} %</td>
+		<td style="text-align:center;font-weight:bold;border-bottom:1px solid black;">{((gapInSvc)? gapinsvc.years:yrsinsvc.years) || 0}</td><td>yrs X 2.5%</td><td>=</td><td style="text-align:right;font-weight:bold;border-bottom:1px solid black;">{computetotalrate.rateYr.toFixed(5)} %</td>
 	</tr>
 	<tr>
-		<td style="text-align:center;font-weight:bold;border-bottom:1px solid black;">{(gapInSvc)? gapinsvc.months:yrsinsvc.months}</td><td>mos/12 x 2.5%</td><td>=</td><td style="text-align:right;font-weight:bold;border-bottom:1px solid black;">{computetotalrate.rateMos.toFixed(5)} %</td>
+		<td style="text-align:center;font-weight:bold;border-bottom:1px solid black;">{((gapInSvc)? gapinsvc.months:yrsinsvc.months) || 0}</td><td>mos/12 x 2.5%</td><td>=</td><td style="text-align:right;font-weight:bold;border-bottom:1px solid black;">{computetotalrate.rateMos.toFixed(5)} %</td>
 	</tr>
 	<tr>
-		<td style="text-align:center;font-weight:bold;border-bottom:1px solid black;">{(gapInSvc)? gapinsvc.days:yrsinsvc.days}</td><td>days/360 x 2.5%</td><td>=</td><td style="text-align:right;font-weight:bold;border-bottom:1px solid black;">{computetotalrate.rateDays.toFixed(5)} %</td>
+		<td style="text-align:center;font-weight:bold;border-bottom:1px solid black;">{((gapInSvc)? gapinsvc.days:yrsinsvc.days) || 0}</td><td>days/360 x 2.5%</td><td>=</td><td style="text-align:right;font-weight:bold;border-bottom:1px solid black;">{computetotalrate.rateDays.toFixed(5)} %</td>
 	</tr>
 	<tr>
 		<td colspan="3" style="text-align:right">TOTAL RATE</td><td style="text-align:right;font-weight:bold;border-bottom:1px solid black;">{computetotalrate.rateTotal.toFixed(5)} %</td>
