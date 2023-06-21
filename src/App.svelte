@@ -270,10 +270,10 @@ Rank:
 		<th></th><th>EARNED</th><th>ENJOYED</th><th>TOTAL</th>
 	</tr>			
 	<tr>
-		<td style="font-weight:bold">VL/ML</td><td style="border-bottom:1px solid black;text-align:right"><input class="leaveInputs" type="number" bind:value={leave.vl}/></td><td style="border-bottom:1px solid black;text-align:center"><input class="leaveInputs" type="number" bind:value={leave.evl}/></td><td style="border-bottom:1px solid black;text-align:right">{computeleave.totalVL}</td>
+		<td style="font-weight:bold">VL/ML</td><td style="border-bottom:1px solid black;text-align:right"><input class="leaveInputs" type="number" bind:value={leave.vl}/></td><td style="border-bottom:1px solid black;text-align:center"><input class="leaveInputs" type="number" bind:value={leave.evl}/></td><td style="border-bottom:1px solid black;text-align:right">{computeleave.totalVL.toFixed(3)}</td>
 	</tr>
 	<tr>
-		<td style="font-weight:bold">SL</td><td style="border-bottom:1px solid black;text-align:right;padding-right:20px;">{leave.vl}</td><td style="border-bottom:1px solid black;text-align:center"><input class="leaveInputs" type="number" bind:value={leave.esl}/></td><td style="border-bottom:1px solid black;text-align:right">{computeleave.totalSL}</td>
+		<td style="font-weight:bold">SL</td><td style="border-bottom:1px solid black;text-align:right;padding-right:20px;">{leave.vl}</td><td style="border-bottom:1px solid black;text-align:center"><input class="leaveInputs" type="number" bind:value={leave.esl}/></td><td style="border-bottom:1px solid black;text-align:right">{computeleave.totalSL.toFixed(3)}</td>
 	</tr>
 	<tr>
 		<td style="font-weight:bold">TOTAL</td><td style="border-bottom:1px solid black;text-align:right;padding-right:20px;">{(leave.vl*2).toFixed(3)}</td><td style="border-bottom:1px solid black;text-align:center">{(leave.evl+leave.esl).toFixed(3)}</td><td style="border-bottom:1px solid black;text-align:right">{computeleave.total.toFixed(3)}</td>
